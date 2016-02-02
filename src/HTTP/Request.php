@@ -11,6 +11,7 @@ use Billingo\API\Connector\Exceptions\JSONParseException;
 use Billingo\API\Connector\Exceptions\RequestErrorException;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Request implements \Billingo\API\Connector\Contracts\Request
 {
@@ -43,7 +44,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	{
 		$resolver = new OptionsResolver();
 		$resolver->setDefault('version', '2');
-		$resolver->setDefault('host', 'https://www.billingo.hu/api'); // might be overridden in the future
+		$resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
 		$resolver->setRequired(['host', 'private_key', 'public_key', 'version']);
 		return $resolver->resolve($opts);
 	}
@@ -55,11 +56,12 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	public function generateAuthHeader()
 	{
 		$time = time();
+		$iss = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'cli';
 		$signatureData = [
 				'sub' => $this->config['public_key'],
 				'iat' => $time,
 				'exp' => $time +60,
-				'iss' => $_SERVER['REQUEST_URI'],
+				'iss' => $iss,
 				'nbf' => $time,
 				'jti' => md5($this->config['public_key'] . $time)
 		];
@@ -94,7 +96,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		if($response->getStatusCode() != 200 || $jsonData['success'] == 0)
 			throw new RequestErrorException('Error: ' . $jsonData['error'], $response->getStatusCode());
 
-		return $jsonData;
+		return $jsonData['data'];
 	}
 
 	/**
