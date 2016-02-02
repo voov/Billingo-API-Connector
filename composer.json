@@ -2,7 +2,7 @@
   "name": "voov/billingo-api-connector",
   "description": "Billingo API Connector",
   "minimum-stability": "dev",
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
       "name": "Daniel Fekete",
