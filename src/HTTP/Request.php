@@ -7,8 +7,8 @@
 
 namespace Billingo\API\Connector\HTTP;
 
-use Billingo\API\Client\Exceptions\JSONParseException;
-use Billingo\API\Client\Exceptions\RequestErrorException;
+use Billingo\API\Connector\Exceptions\JSONParseException;
+use Billingo\API\Connector\Exceptions\RequestErrorException;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 
@@ -24,15 +24,34 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 
 	/**
 	 * Request constructor.
-	 * @param Client $client
+	 * @param $options
 	 */
-	public function __construct(Client $client)
+	public function __construct($options)
 	{
-        $this->config = container('config');
-		$this->client = $client;
+        $this->config = $this->resolveOptions($options);
+		$this->client = new Client([
+			'base_uri' => $this->config['host']
+								   ]);
 	}
 
+	/**
+	 * Get required options for the Billingo API to work
+	 * @param $opts
+	 * @return mixed
+	 */
+	protected function resolveOptions($opts)
+	{
+		$resolver = new OptionsResolver();
+		$resolver->setDefault('version', '2');
+		$resolver->setDefault('host', 'https://www.billingo.hu/api'); // might be overridden in the future
+		$resolver->setRequired(['host', 'private_key', 'public_key', 'version']);
+		return $resolver->resolve($opts);
+	}
 
+	/**
+	 * Generate JWT authorization header
+	 * @return string
+	 */
 	public function generateAuthHeader()
 	{
 		$time = time();
@@ -73,7 +92,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$jsonData = json_decode($response->getBody(), true);
 		if($jsonData == null) throw new JSONParseException('Cannot decode: ' . $response->getBody());
 		if($response->getStatusCode() != 200 || $jsonData['success'] == 0)
-			throw new RequestErrorException('Error: ' . $jsonData['msg'], $response->getStatusCode());
+			throw new RequestErrorException('Error: ' . $jsonData['error'], $response->getStatusCode());
 
 		return $jsonData;
 	}
