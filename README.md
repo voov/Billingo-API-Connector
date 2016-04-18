@@ -1,14 +1,16 @@
 # Billingo API Connector
 
 This package is the PHP connector for the Billingo API 2.0.
-The full API documentation is available [here](http://billingo.readthedocs.org/en/latest/).
+The full API documentation is available [here](http://billingo.readthedocs.org/en/latest/).  
+**Important:** This version uses cURL instead of Guzzle for HTTP requests, this way it is compatible with older
+ PHP versions. However the usage of this version is not recommended if newer PHP (>5.6.0) is available!
 
 ## Installing
 
 The easiest way to install the Connector is using Composer:
 
 ```
-composer require voov/billingo-api-connector
+composer require voov/billingo-api-connector:dev-cron
 ```
 
 Then use your framework's autoload, or simply add:
