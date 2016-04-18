@@ -29,9 +29,6 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	public function __construct($options)
 	{
         $this->config = $this->resolveOptions($options);
-		$this->client = new Client([
-			'base_uri' => $this->config['host']
-								   ]);
 	}
 
 	/**
