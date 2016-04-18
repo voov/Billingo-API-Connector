@@ -21,7 +21,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	private $client;
 
 
-    private $config;
+	private $config;
 
 	/**
 	 * Request constructor.
@@ -29,10 +29,12 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 */
 	public function __construct($options)
 	{
-        $this->config = $this->resolveOptions($options);
+		$this->config = $this->resolveOptions($options);
 		$this->client = new Client([
-			'base_uri' => $this->config['host']
-								   ]);
+				'verify' => false,
+				'base_uri' => $this->config['host'],
+				'debug' => false
+		]);
 	}
 
 	/**
@@ -81,13 +83,13 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	public function request($method, $uri, $data=[])
 	{
 
-        // get the key to use for the query
-        if($method == strtoupper('GET') || $method == strtoupper('DELETE')) $queryKey = 'query';
-        else $queryKey = 'form_data';
+		// get the key to use for the query
+		if($method == strtoupper('GET') || $method == strtoupper('DELETE')) $queryKey = 'query';
+		else $queryKey = 'json';
 
-        // make signature
-        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' =>[
-			'Authorization' => 'Beamer ' . $this->generateAuthHeader()
+		// make signature
+		$response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' =>[
+				'Authorization' => 'Bearer ' . $this->generateAuthHeader()
 		]]);
 
 
