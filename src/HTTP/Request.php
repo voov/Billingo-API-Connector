@@ -49,6 +49,24 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	}
 
 	/**
+	 * Generate URL
+	 * @param $uri
+	 * @param array $data
+	 * @return string
+	 */
+	public function getURL($uri, $data = [])
+	{
+		$host = rtrim($this->config['host'], '/');
+		$uri = trim($uri, '/');
+
+		$url = "{$host}/{$uri}";
+
+		if(count($data) > 0) $url .= '?' . http_build_query($data);
+
+		return $url;
+	}
+
+	/**
 	 * Generate JWT authorization header
 	 * @return string
 	 */
@@ -89,7 +107,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		// get the key to use for the query
 		if($method == 'GET' || $method == 'DELETE') {
 
-			$url = rtrim($uri, '/') . '?' . http_build_query($data);
+			$url = $this->getURL($uri, $data);
 		}
 		else {
 			$jsonString = json_encode($data);
@@ -98,7 +116,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 			$headers[] = 'Content-type: application/json';
 			$headers[] = "Content-length: {$jsonStringLen}";
 
-			$url = $uri;
+			$url = $this->getURL($uri);
 
 			curl_setopt($c, CURLOPT_POSTFIELDS, $jsonString);
 		}
