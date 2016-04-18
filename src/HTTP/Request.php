@@ -10,7 +10,6 @@ namespace Billingo\API\Connector\HTTP;
 use Billingo\API\Connector\Exceptions\JSONParseException;
 use Billingo\API\Connector\Exceptions\RequestErrorException;
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Request implements \Billingo\API\Connector\Contracts\Request
@@ -80,21 +79,44 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 */
 	public function request($method, $uri, $data=[])
 	{
+		$c = curl_init();
+		$headers = ['Authorization: Bearer ' . $this->generateAuthHeader()];
 
-        // get the key to use for the query
-        if($method == strtoupper('GET') || $method == strtoupper('DELETE')) $queryKey = 'query';
-        else $queryKey = 'form_data';
+		$method = strtoupper($method);
 
-        // make signature
-        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' =>[
-			'Authorization' => 'Beamer ' . $this->generateAuthHeader()
-		]]);
+		curl_setopt($c, CURLOPT_CUSTOMREQUEST, $method);
+
+		// get the key to use for the query
+		if($method == 'GET' || $method == 'DELETE') {
+
+			$url = rtrim($uri, '/') . '?' . http_build_query($data);
+		}
+		else {
+			$jsonString = json_encode($data);
+			$jsonStringLen = strlen($jsonString);
+
+			$headers[] = 'Content-type: application/json';
+			$headers[] = "Content-length: {$jsonStringLen}";
+
+			$url = $uri;
+
+			curl_setopt($c, CURLOPT_POSTFIELDS, $jsonString);
+		}
 
 
-		$jsonData = json_decode($response->getBody(), true);
-		if($jsonData == null) throw new JSONParseException('Cannot decode: ' . $response->getBody());
-		if($response->getStatusCode() != 200 || $jsonData['success'] == 0)
-			throw new RequestErrorException('Error: ' . $jsonData['error'], $response->getStatusCode());
+		curl_setopt($c, CURLOPT_URL, $url);
+		curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+
+		$response = curl_exec($c);
+		$statusCode = curl_getinfo($c, CURLINFO_HTTP_CODE);
+		curl_close($c);
+
+		$jsonData = json_decode($response, true);
+		if($jsonData == null) throw new JSONParseException('Cannot decode: ' . $response);
+		if($statusCode != 200 || $jsonData['success'] == 0)
+			throw new RequestErrorException('Error: ' . $jsonData['error'], $statusCode);
+
 
 		return $jsonData['data'];
 	}
@@ -103,7 +125,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * GET
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed
 	 */
 	public function get($uri, $data=[])
 	{
@@ -114,7 +136,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * POST
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed
 	 */
 	public function post($uri, $data=[])
 	{
@@ -125,7 +147,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * PUT
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed
 	 */
 	public function put($uri, $data = [])
 	{
@@ -137,7 +159,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * DELETE
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed
 	 */
 	public function delete($uri, $data = [])
 	{

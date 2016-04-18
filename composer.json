@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "guzzlehttp/guzzle": "6.1.*",
+    "php": ">=5.4.0",
+    "ext-curl": "*",
     "firebase/php-jwt": "^3.0",
     "symfony/options-resolver": "2.7.*"
   },
