@@ -41,7 +41,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$resolver = new OptionsResolver();
 		$resolver->setDefault('version', '2');
 		$resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
-		$resolver->setRequired(['host', 'private_key', 'public_key', 'version']);
+		$resolver->setRequired(array('host', 'private_key', 'public_key', 'version'));
 		return $resolver->resolve($opts);
 	}
 
@@ -51,7 +51,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @param array $data
 	 * @return string
 	 */
-	public function getURL($uri, $data = [])
+	public function getURL($uri, $data = array())
 	{
 		$host = rtrim($this->config['host'], '/');
 		$uri = trim($uri, '/');
@@ -71,14 +71,14 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	{
 		$time = time();
 		$iss = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'cli';
-		$signatureData = [
+		$signatureData = array(
 				'sub' => $this->config['public_key'],
 				'iat' => $time,
 				'exp' => $time +60,
 				'iss' => $iss,
 				'nbf' => $time,
 				'jti' => md5($this->config['public_key'] . $time)
-		];
+		);
 
 		return JWT::encode($signatureData, $this->config['private_key']);
 	}
@@ -92,10 +92,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @throws JSONParseException
 	 * @throws RequestErrorException
 	 */
-	public function request($method, $uri, $data=[])
+	public function request($method, $uri, $data=array())
 	{
 		$c = curl_init();
-		$headers = ['Authorization: Bearer ' . $this->generateAuthHeader()];
+		$headers = array('Authorization: Bearer ' . $this->generateAuthHeader());
 
 		$method = strtoupper($method);
 
@@ -142,7 +142,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @param array $data
 	 * @return mixed
 	 */
-	public function get($uri, $data=[])
+	public function get($uri, $data=array())
 	{
 		return $this->request('GET', $uri, $data);
 	}
@@ -153,7 +153,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @param array $data
 	 * @return mixed
 	 */
-	public function post($uri, $data=[])
+	public function post($uri, $data=array())
 	{
 		return $this->request('POST', $uri, $data);
 	}
@@ -164,7 +164,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @param array $data
 	 * @return mixed
 	 */
-	public function put($uri, $data = [])
+	public function put($uri, $data = array())
 	{
 		return $this->request('PUT', $uri, $data);
 	}
@@ -176,7 +176,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * @param array $data
 	 * @return mixed
 	 */
-	public function delete($uri, $data = [])
+	public function delete($uri, $data = array())
 	{
 		return $this->request('DELETE', $uri, $data);
 	}

@@ -37,7 +37,7 @@ class Route
 	 * @param bool $absolute
 	 * @return string
 	 */
-	public function path($params=[], $absolute=false)
+	public function path($params=array(), $absolute=false)
 	{
 		$paramsString = implode('/', (array)$params);
 		$path = rtrim($this->uri, '/') . '/' . $paramsString;
