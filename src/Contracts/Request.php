@@ -17,7 +17,7 @@ interface Request
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
-    public function get($uri, $data = []);
+    public function get($uri, $data = array());
 
     /**
      * POST
@@ -25,7 +25,7 @@ interface Request
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
-    public function post($uri, $data = []);
+    public function post($uri, $data = array());
 
     /**
      * PUT
@@ -33,7 +33,7 @@ interface Request
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
-    public function put($uri, $data = []);
+    public function put($uri, $data = array());
 
     /**
      * DELETE
@@ -41,5 +41,5 @@ interface Request
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
-    public function delete($uri, $data = []);
+    public function delete($uri, $data = array());
 }
