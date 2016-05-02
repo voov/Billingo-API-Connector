@@ -41,9 +41,8 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$resolver = new OptionsResolver();
 		$resolver->setDefault('version', '2');
 		$resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
-		$resolver->setRequired(array('host', 'private_key', 'public_key', 'version'));
 		$resolver->setDefault('leeway', 60);
-		$resolver->setRequired(['host', 'private_key', 'public_key', 'version', 'leeway']);
+		$resolver->setRequired(array('host', 'private_key', 'public_key', 'version', 'leeway'));
 		return $resolver->resolve($opts);
 	}
 
