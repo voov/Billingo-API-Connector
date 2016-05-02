@@ -11,6 +11,7 @@ use Billingo\API\Connector\Exceptions\JSONParseException;
 use Billingo\API\Connector\Exceptions\RequestErrorException;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Request implements \Billingo\API\Connector\Contracts\Request
@@ -29,6 +30,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 */
 	public function __construct($options)
 	{
+		
 		$this->config = $this->resolveOptions($options);
 		$this->client = new Client([
 				'verify' => false,
@@ -47,7 +49,8 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$resolver = new OptionsResolver();
 		$resolver->setDefault('version', '2');
 		$resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
-		$resolver->setRequired(['host', 'private_key', 'public_key', 'version']);
+		$resolver->setDefault('leeway', 60);
+		$resolver->setRequired(['host', 'private_key', 'public_key', 'version', 'leeway']);
 		return $resolver->resolve($opts);
 	}
 
@@ -62,9 +65,9 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$signatureData = [
 				'sub' => $this->config['public_key'],
 				'iat' => $time,
-				'exp' => $time +60,
+				'exp' => $time + $this->config['leeway'],
 				'iss' => $iss,
-				'nbf' => $time,
+				'nbf' => $time - $this->config['leeway'],
 				'jti' => md5($this->config['public_key'] . $time)
 		];
 
@@ -105,7 +108,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * GET
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed|ResponseInterface
 	 */
 	public function get($uri, $data=[])
 	{
@@ -116,7 +119,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * POST
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed|ResponseInterface
 	 */
 	public function post($uri, $data=[])
 	{
@@ -127,7 +130,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * PUT
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed|ResponseInterface
 	 */
 	public function put($uri, $data = [])
 	{
@@ -139,7 +142,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	 * DELETE
 	 * @param $uri
 	 * @param array $data
-	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 * @return mixed|ResponseInterface
 	 */
 	public function delete($uri, $data = [])
 	{
