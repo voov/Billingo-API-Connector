@@ -73,6 +73,10 @@ You can start making requests to the Billingo API just by creating a new `Reques
 
 The `Request` class takes care of the communication between your app and the Billingo API server with JWT authorization handled in the background.
 
+#### JWT Time leeway
+
+To adjust for some time skew between the client and the API server, you can set the `leeway` parameter when creating the new instance. The leeway is measured in seconds and the default value is 60. This modifies the `nbf` and `exp` claims of the JWT, so in the case of the default leeway, the token is valid one minute before and after the issue time.
+
 ## General usage
 
 ### Get resource
