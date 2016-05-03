@@ -10,7 +10,7 @@ The full API documentation is available [here](http://billingo.readthedocs.org/e
 The easiest way to install the Connector is using Composer:
 
 ```
-composer require voov/billingo-api-connector:dev-cron
+composer require voov/billingo-api-connector:dev-curl
 ```
 
 Then use your framework's autoload, or simply add:
