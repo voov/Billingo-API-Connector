@@ -130,8 +130,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 
 		$jsonData = json_decode($response, true);
 		if($jsonData == null) throw new JSONParseException('Cannot decode: ' . $response);
-		if($statusCode != 200 || $jsonData['success'] == 0)
-			throw new RequestErrorException('Error: ' . $jsonData['error'], $statusCode);
+		if($statusCode != 200 || $jsonData['success'] == 0){
+            $errorData = array_key_exists('error', $jsonData) ? $jsonData['error'] : var_export($jsonData['errors'], true);
+            throw new RequestErrorException('Error: ' . $errorData, $statusCode);
+        }
 
 
 		return $jsonData['data'];
