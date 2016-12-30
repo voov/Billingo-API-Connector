@@ -75,7 +75,7 @@ The `Request` class takes care of the communication between your app and the Bil
 
 #### JWT Time leeway
 
-To adjust for some time skew between the client and the API server, you can set the `leeway` parameter when creating the new instance. The leeway is measured in seconds and the default value is 60. This modifies the `nbf` and `exp` claims of the JWT, so in the case of the default leeway, the token is valid one minute before and after the issue time.
+To adjust for some time skew between the client and the API server, you can set the `leeway` parameter when creating the new instance. The leeway is measured in seconds and the default value is 60. This modifies the `nbf`, `iat` and `exp` claims of the JWT, so in the case of the default leeway, the token is valid one minute before and after the issue time.
 
 ## General usage
 
@@ -83,12 +83,13 @@ To adjust for some time skew between the client and the API server, you can set 
 
 ```php
 <?php
-// Return the list of clients
+// Return the first page of the clients
 $clients = $billingo->get('clients');
+// Return the next page
+$clients = $billingo->get('clients', ['page' => 2]);
 
 // Return one client
 $client = $billingo->get('clients/123456789');
-
 ```
 
 ### Save resource
