@@ -64,13 +64,12 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 		$iss = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'cli';
 		$signatureData = [
 				'sub' => $this->config['public_key'],
-				'iat' => $time,
+				'iat' => $time - $this->config['leeway'],
 				'exp' => $time + $this->config['leeway'],
 				'iss' => $iss,
 				'nbf' => $time - $this->config['leeway'],
 				'jti' => md5($this->config['public_key'] . $time)
 		];
-
 		return JWT::encode($signatureData, $this->config['private_key']);
 	}
 
