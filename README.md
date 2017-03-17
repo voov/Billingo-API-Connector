@@ -128,3 +128,27 @@ $billingo->put('clients/123456789', $newData);
 // delete client
 $billingo->delete('clients/123456789');
 ```
+
+### Download invoice
+
+You can download the generated invoice in a PDF format
+
+When passing the second parameter, you can specify a filename or a resource opened with `fopen` where the PDF will be saved. Otherwise a `GuzzleHttp\Psr7\Stream` is returned which you can read from.
+
+```php
+<?php
+  $billingo->downloadInvoice('123456789', 'filename.pdf');
+```
+
+#### Using the stream interface
+
+```php
+<?php
+  $invoice = $billingo->downloadInvoice('123456789');
+  if($invoice->isReadable()) {
+      while(!$invoice->eof()) {
+          echo $invoice->read(1);
+      }    
+  }
+```
+

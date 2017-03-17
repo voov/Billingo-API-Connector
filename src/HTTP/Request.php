@@ -147,4 +147,21 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	{
 		return $this->request('DELETE', $uri, $data);
 	}
+
+    /**
+     * Downloads the given invoice
+     * @param $id
+     * @param null|resource|string $file
+     * @return \Psr\Http\Message\StreamInterface|string|null
+     */
+    public function downloadInvoice($id, $file=null)
+    {
+        $uri = "invoices/{$id}/download";
+        $options = ['headers' => [
+            'Authorization' => 'Bearer ' . $this->generateAuthHeader()
+        ]];
+        if(!is_null($file)) $options['sink'] = $file;
+        $response = $this->client->request('GET', $uri, $options);
+        return $response instanceof ResponseInterface ? $response->getBody() : null;
+	}
 }
