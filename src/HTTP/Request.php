@@ -19,10 +19,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
 	/**
 	 * @var Client
 	 */
-	private $client;
+	protected $client;
 
 
-	private $config;
+	protected $config;
 
 	/**
 	 * Request constructor.
