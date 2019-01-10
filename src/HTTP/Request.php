@@ -21,7 +21,13 @@ class Request implements \Billingo\API\Connector\Contracts\Request
      */
     private $client;
 
+    /** @var array  */
     private $config;
+
+    /**
+     * @var OptionsResolver
+     */
+    private $resolver;
 
     /**
      * Request constructor.
@@ -47,34 +53,16 @@ class Request implements \Billingo\API\Connector\Contracts\Request
      */
     protected function resolveOptions($opts)
     {
-        $resolver = new OptionsResolver();
-        $resolver->setDefault('version', '2');
-        $resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
-        $resolver->setDefault('leeway', 60);
-        $resolver->setRequired(['host', 'private_key', 'public_key', 'version', 'leeway']);
+        $this->resolver = new OptionsResolver();
+        $this->resolver->setDefault('version', '2');
+        $this->resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
+        $this->resolver->setDefault('leeway', 60);
+        $this->resolver->setRequired(['host', 'version', 'leeway']);
 
-        return $resolver->resolve($opts);
-    }
+        if(array_key_exists('token', $opts)) $this->resolver->setRequired('token');
+        else $this->resolver->setRequired(['private_key', 'public_key']);
 
-    /**
-     * Generate JWT authorization header.
-     *
-     * @return string
-     */
-    public function generateAuthHeader()
-    {
-        $time = time();
-        $iss = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'cli';
-        $signatureData = [
-                'sub' => $this->config['public_key'],
-                'iat' => $time - $this->config['leeway'],
-                'exp' => $time + $this->config['leeway'],
-                'iss' => $iss,
-                'nbf' => $time - $this->config['leeway'],
-                'jti' => md5($this->config['public_key'].$time),
-        ];
-
-        return JWT::encode($signatureData, $this->config['private_key']);
+        return $this->resolver->resolve($opts);
     }
 
     /**
@@ -100,9 +88,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
         }
 
         // make signature
-        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' => [
-            'Authorization' => 'Bearer '.$this->generateAuthHeader(),
-        ]]);
+        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' => $this->generateAuthHeader()]);
 
         $jsonData = json_decode($response->getBody(), true);
 
@@ -202,14 +188,70 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     public function downloadInvoice($id, $file = null)
     {
         $uri = "invoices/{$id}/download";
-        $options = ['headers' => [
-            'Authorization' => 'Bearer '.$this->generateAuthHeader(),
-        ]];
+        $options = ['headers' => $this->generateAuthHeader()];
         if (!is_null($file)) {
             $options['sink'] = $file;
         }
         $response = $this->client->request('GET', $uri, $options);
 
         return $response instanceof ResponseInterface ? $response->getBody() : null;
+    }
+
+    /**
+     * Generate JWT authorization header.
+     *
+     * @return string
+     */
+    public function generateJWTArray()
+    {
+        $time = time();
+        $iss = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'cli';
+        $signatureData = [
+            'sub' => $this->config['public_key'],
+            'iat' => $time - $this->config['leeway'],
+            'exp' => $time + $this->config['leeway'],
+            'iss' => $iss,
+            'nbf' => $time - $this->config['leeway'],
+            'jti' => md5($this->config['public_key'].$time),
+        ];
+
+        return JWT::encode($signatureData, $this->config['private_key']);
+    }
+
+    /**
+     * Generate authentication header based on JWT
+     *
+     * @return array
+     */
+    protected function generateJWTHeader()
+    {
+        return [
+            'Authorization' => 'Bearer ' . $this->generateJWTArray(),
+        ];
+    }
+
+    /**
+     * When using BillingoToken for authentication
+     * use this function to generate the correct header
+     *
+     * @return array
+     */
+    protected function generateBillingoTokenHeader()
+    {
+        return [
+            'X-Billingo-Token' => $this->config['token']
+        ];
+    }
+
+    /**
+     * Generate the correct authentication header(s)
+     * either JWT or BillingoToken
+     *
+     * @return array
+     */
+    protected function generateAuthHeader()
+    {
+        if($this->resolver->isDefined('token')) return $this->generateBillingoTokenHeader();
+        else return $this->generateJWTHeader();
     }
 }
