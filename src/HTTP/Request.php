@@ -21,7 +21,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
      */
     private $client;
 
-    /** @var array  */
+    /** @var array */
     private $config;
 
     /**
@@ -59,8 +59,11 @@ class Request implements \Billingo\API\Connector\Contracts\Request
         $this->resolver->setDefault('leeway', 60);
         $this->resolver->setRequired(['host', 'version', 'leeway']);
 
-        if(array_key_exists('token', $opts)) $this->resolver->setRequired('token');
-        else $this->resolver->setRequired(['private_key', 'public_key']);
+        if (array_key_exists('token', $opts)) {
+            $this->resolver->setRequired('token');
+        } else {
+            $this->resolver->setRequired(['private_key', 'public_key']);
+        }
 
         return $this->resolver->resolve($opts);
     }
@@ -219,39 +222,42 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     }
 
     /**
-     * Generate authentication header based on JWT
+     * Generate authentication header based on JWT.
      *
      * @return array
      */
     protected function generateJWTHeader()
     {
         return [
-            'Authorization' => 'Bearer ' . $this->generateJWTArray(),
+            'Authorization' => 'Bearer '.$this->generateJWTArray(),
         ];
     }
 
     /**
      * When using BillingoToken for authentication
-     * use this function to generate the correct header
+     * use this function to generate the correct header.
      *
      * @return array
      */
     protected function generateBillingoTokenHeader()
     {
         return [
-            'X-Billingo-Token' => $this->config['token']
+            'X-Billingo-Token' => $this->config['token'],
         ];
     }
 
     /**
      * Generate the correct authentication header(s)
-     * either JWT or BillingoToken
+     * either JWT or BillingoToken.
      *
      * @return array
      */
     protected function generateAuthHeader()
     {
-        if($this->resolver->isDefined('token')) return $this->generateBillingoTokenHeader();
-        else return $this->generateJWTHeader();
+        if ($this->resolver->isDefined('token')) {
+            return $this->generateBillingoTokenHeader();
+        } else {
+            return $this->generateJWTHeader();
+        }
     }
 }
