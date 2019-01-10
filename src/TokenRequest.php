@@ -4,10 +4,10 @@
  * All rights reserved.
  */
 
-namespace Billingo\API\Connector\TokenRequest;
+namespace Billingo\API\Connector;
 
-use Billingo\API\Connector\TokenRequest\Exceptions\SignatureInvalid;
-use Billingo\API\Connector\TokenRequest\Exceptions\TimingInvalid;
+use Billingo\API\Connector\Exceptions\SignatureInvalid;
+use Billingo\API\Connector\Exceptions\TimingInvalid;
 
 class TokenRequest
 {

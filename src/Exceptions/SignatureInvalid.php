@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-namespace Billingo\API\Connector\TokenRequest\Exceptions;
+namespace Billingo\API\Connector\Exceptions;
 
 
 class SignatureInvalid extends \Exception

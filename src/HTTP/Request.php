@@ -9,7 +9,7 @@ namespace Billingo\API\Connector\HTTP;
 
 use Billingo\API\Connector\Exceptions\JSONParseException;
 use Billingo\API\Connector\Exceptions\RequestErrorException;
-use Billingo\API\Connector\TokenRequest\TokenRequest;
+use Billingo\API\Connector\TokenRequest;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
