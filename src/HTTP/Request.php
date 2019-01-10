@@ -9,6 +9,7 @@ namespace Billingo\API\Connector\HTTP;
 
 use Billingo\API\Connector\Exceptions\JSONParseException;
 use Billingo\API\Connector\Exceptions\RequestErrorException;
+use Billingo\API\Connector\TokenRequest\TokenRequest;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
@@ -198,6 +199,26 @@ class Request implements \Billingo\API\Connector\Contracts\Request
         $response = $this->client->request('GET', $uri, $options);
 
         return $response instanceof ResponseInterface ? $response->getBody() : null;
+    }
+
+    /**
+     * Get billingo token for user.
+     *
+     * @param $pubKey
+     * @param $privateKey
+     *
+     * @return string Billingo token
+     *
+     * @throws JSONParseException
+     * @throws RequestErrorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getBillingoToken($pubKey, $privateKey)
+    {
+        $tr = new TokenRequest($pubKey, $privateKey);
+        $response = $this->get('token', ['tokenrequest' => $tr->generateWithSignatureAndTiming()]);
+
+        return $response['token'];
     }
 
     /**
