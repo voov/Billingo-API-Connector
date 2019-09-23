@@ -58,6 +58,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
         $this->resolver->setDefault('version', '2');
         $this->resolver->setDefault('host', 'https://www.billingo.hu/api/'); // might be overridden in the future
         $this->resolver->setDefault('leeway', 60);
+        $this->resolver->setDefault('headers', []);
         $this->resolver->setRequired(['host', 'version', 'leeway']);
 
         if (array_key_exists('token', $opts)) {
@@ -91,8 +92,8 @@ class Request implements \Billingo\API\Connector\Contracts\Request
             $queryKey = 'json';
         }
 
-        // make signature
-        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' => $this->generateAuthHeader()]);
+        $headers = array_merge_recursive($this->config['headers'], $this->generateAuthHeader());
+        $response = $this->client->request($method, $uri, [$queryKey => $data, 'headers' => $headers]);
 
         $jsonData = json_decode($response->getBody(), true);
 
