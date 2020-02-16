@@ -18,6 +18,7 @@ class TokenRequest
      * @var string
      */
     private $pubKey;
+
     /**
      * @var string
      */
@@ -32,7 +33,7 @@ class TokenRequest
     /**
      * Generate token request data.
      *
-     * @param $timing
+     * @param int $timing
      *
      * @return string
      */
@@ -54,7 +55,7 @@ class TokenRequest
     /**
      * Generate data string with signature.
      *
-     * @param $timing
+     * @param int $timing
      *
      * @return string
      */
@@ -78,7 +79,7 @@ class TokenRequest
     /**
      * Return TRUE if timing is valid.
      *
-     * @param $userTiming
+     * @param int $userTiming
      *
      * @return bool
      */
@@ -90,8 +91,8 @@ class TokenRequest
     /**
      * Validate user string to be valid.
      *
-     * @param $userString
-     * @param $timing
+     * @param string $userString
+     * @param int $timing
      *
      * @return bool
      */
