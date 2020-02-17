@@ -33,7 +33,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * Request constructor.
      *
-     * @param $options
+     * @param array $options
      */
     public function __construct($options)
     {
@@ -48,9 +48,9 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * Get required options for the Billingo API to work.
      *
-     * @param $opts
+     * @param array $opts
      *
-     * @return mixed
+     * @return array
      */
     protected function resolveOptions($opts)
     {
@@ -73,11 +73,11 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * Make a request to the Billingo API.
      *
-     * @param $method
-     * @param $uri
+     * @param string $method
+     * @param string $uri
      * @param array $data
      *
-     * @return mixed|array
+     * @return ResponseInterface
      *
      * @throws JSONParseException
      * @throws RequestErrorException
@@ -109,16 +109,17 @@ class Request implements \Billingo\API\Connector\Contracts\Request
             return $jsonData['data'];
         }
 
+        // FIXME What could it be?
         return [];
     }
 
     /**
      * GET.
      *
-     * @param $uri
+     * @param string $uri
      * @param array $data
      *
-     * @return mixed|ResponseInterface
+     * @return ResponseInterface
      *
      * @throws JSONParseException
      * @throws RequestErrorException
@@ -132,10 +133,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * POST.
      *
-     * @param $uri
+     * @param string $uri
      * @param array $data
      *
-     * @return mixed|ResponseInterface
+     * @return ResponseInterface
      *
      * @throws JSONParseException
      * @throws RequestErrorException
@@ -149,10 +150,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * PUT.
      *
-     * @param $uri
+     * @param string $uri
      * @param array $data
      *
-     * @return mixed|ResponseInterface
+     * @return ResponseInterface
      *
      * @throws JSONParseException
      * @throws RequestErrorException
@@ -166,10 +167,10 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * DELETE.
      *
-     * @param $uri
+     * @param string $uri
      * @param array $data
      *
-     * @return mixed|ResponseInterface
+     * @return ResponseInterface
      *
      * @throws JSONParseException
      * @throws RequestErrorException
@@ -183,7 +184,7 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * Downloads the given invoice.
      *
-     * @param $id
+     * @param string $id
      * @param resource|string|null $file
      *
      * @return \Psr\Http\Message\StreamInterface|string|null
@@ -205,8 +206,8 @@ class Request implements \Billingo\API\Connector\Contracts\Request
     /**
      * Get billingo token for user.
      *
-     * @param $pubKey
-     * @param $privateKey
+     * @param string $pubKey
+     * @param string $privateKey
      *
      * @return string Billingo token
      *

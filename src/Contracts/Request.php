@@ -13,7 +13,7 @@ interface Request
 
     /**
      * GET
-     * @param $uri
+     * @param string $uri
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
@@ -21,7 +21,7 @@ interface Request
 
     /**
      * POST
-     * @param $uri
+     * @param string $uri
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
@@ -29,7 +29,7 @@ interface Request
 
     /**
      * PUT
-     * @param $uri
+     * @param string $uri
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
@@ -37,7 +37,7 @@ interface Request
 
     /**
      * DELETE
-     * @param $uri
+     * @param string $uri
      * @param array $data
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
